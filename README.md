@@ -7,4 +7,5 @@
 5. QC_breast --> Script del control de calidad para los pacientes de cancer de mama. (El script es el mismo que para prostata pero cambiando el nombre de las variables).
 6. --> Script que realiza un LASSO para la detección de las covariables, añade aquellas dictadas por oncólogos especialistas y los 10 PCAs obtenidas en el paso de la estratificación poblacional del control de calidad.
 7. GWAS_breast --> 
-8.  
+8. --> Biomart
+9. PRS --> 
