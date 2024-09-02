@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 #SBATCH --job-name= QC # Job name
@@ -10,24 +11,19 @@
 #SBATCH --output=%x_%j.log   # Standard output and error log
 #SBATCH --error=%x_%j.err
 
-cut -d ',' -f 2 prostate_GWAS_recurrence_updated.csv > pacientes_prostate.txt
 
 singularity run -H $PWD:/home/ plink19.sif /plink --vcf imputed_prostate.vcf.gz --make-bed --out imputed_prostate
-singularity run -H $PWD:/home/ plink19.sif /plink --bfile imputed_prostate --exclude snp_ids.txt --make-bed --out imputed_prostate_new
-
-awk '{$5=1; print}' imputed_prostate_new.fam > archivo_sin_snps_hombres.fam
-rm imputed_prostate.*
+awk '{$5=2; print}' imputed_prostate.fam > archivo_sin_snps_hombres.fam
+rm imputed_prostate.fam
 mv archivo_sin_snps_hombres.fam imputed_prostate.fam
-mv imputed_prostate_new.bed imputed_prostate.bed
-mv imputed_prostate_new.bim imputed_prostate.bim
 
 # STEP 1
 # Investigate missingness per individual and per SNP and make histograms.
-singularity run -H $PWD:/mnt/bioinfnas/bioinformatics/test/david/QC/ plink19.sif /plink --bfile imputed_prostate --missing 
+singularity run -H $PWD:/mnt/bioinfnas/bioinformatics/test/david/QC/ plink19.sif /plink --bfile imputed_prostate--missing 
 singularity run -H $PWD:/mnt/bioinfnas/bioinformatics/test/david/QC/ r-immunedeconv-qqman-optparse.sif Rscript hist_miss.R
 
 # Delete SNPs with missingness >0.2.
-singularity run -H $PWD:/mnt/bioinfnas/bioinformatics/test/david/QC/ plink19.sif /plink --bfile imputed_prostate --geno 0.2 --make-bed --out imputed_prostate_2
+singularity run -H $PWD:/mnt/bioinfnas/bioinformatics/test/david/QC/ plink19.sif /plink --bfile imputed_prostate_sin_snps --geno 0.2 --make-bed --out imputed_prostate_2
 # Delete individuals with missingness >0.02.
 singularity run -H $PWD:/mnt/bioinfnas/bioinformatics/test/david/QC/ plink19.sif /plink --bfile imputed_prostate_2 --mind 0.2 --make-bed --out imputed_prostate_3
 # Delete SNPs with missingness >0.02.
@@ -143,7 +139,7 @@ sed 's/PUR/AMR/g' race_1kG13.txt>race_1kG14.txt
 awk '{print$1,$2,"OWN"}' imputed_prostate_MDS.fam>racefile_own.txt
 cat race_1kG14.txt racefile_own.txt | sed -e '1i\FID IID race' > racefile.txt
 singularity run -H $PWD:/mnt/bioinfnas/bioinformatics/test/david/QC/ r-immunedeconv-qqman-optparse.sif Rscript MDS_merged.R
-awk '{ if ($4 < -0.005 && $5 <0.03) print $1,$2 }' MDS_merge2.mds > EUR_MDS_merge2
+awk '{ if ($4 < -0.01 && $5 <0.03) print $1,$2 }' MDS_merge2.mds > EUR_MDS_merge2
 singularity run -H $PWD:/mnt/bioinfnas/bioinformatics/test/david/QC/ plink19.sif /plink --bfile imputed_prostate_11 --keep EUR_MDS_merge2 --make-bed --out imputed_prostate_12
 
 
@@ -195,7 +191,7 @@ sed 's/PUR/AMR/g' race_1kG9_sub.txt>race_1kG10_sub.txt
 awk '{print$1,$2,"OWN"}' imputed_prostate_MDS_sub.fam>racefile_own_sub.txt
 cat race_1kG10_sub.txt racefile_own_sub.txt | sed -e '1i\FID IID race' > racefile_sub.txt
 singularity run -H $PWD:/mnt/bioinfnas/bioinformatics/test/david/QC/ r-immunedeconv-qqman-optparse.sif Rscript MDS_merged_sub.R
-awk '{ if ($4 < -0.005 && $5 <0.03) print $1,$2 }' MDS_merge2_sub.mds > EUR_MDS_merge2_sub
+awk '{ if ($4 < 0 && $5 <0.03) print $1,$2 }' MDS_merge2_sub.mds > EUR_MDS_merge2_sub
 singularity run -H $PWD:/mnt/bioinfnas/bioinformatics/test/david/QC/ plink19.sif /plink --bfile imputed_prostate_12 --keep EUR_MDS_merge2 --make-bed --out imputed_prostate_13
 
 
