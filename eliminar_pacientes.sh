@@ -9,7 +9,6 @@
 #SBATCH --output=%x_%j.log   # Standard output and error log
 #SBATCH --error=%x_%j.err
 
-#Quedarme solo con pacientes de mama
-
 singularity run -H $PWD:/home/ bcftools.sif bcftools view --samples-file pacientes_breast.txt imputed.vcf.gz -o imputed_breast.vcf.gz
+singularity run -H $PWD:/home/ bcftools.sif bcftools view --samples-file pacientes_prostate.txt imputed.vcf.gz -o imputed_prostate.vcf.gz
 echo "Finish"
