@@ -10,3 +10,4 @@
 #SBATCH --error=%x_%j.err
 
 singularity run -H $PWD:/mnt/bioinfnas/bioinformatics/test/david/previo_al_QC/ bcftools.sif bcftools view -T ^eli_snps.txt imputed_breast.vcf.gz -o imputed_breast_alta_calidad.vcf.gz
+singularity run -H $PWD:/mnt/bioinfnas/bioinformatics/test/david/previo_al_QC/ bcftools.sif bcftools view -T ^eli_snps.txt imputed_prostate.vcf.gz -o imputed_prostate_alta_calidad.vcf.gz
